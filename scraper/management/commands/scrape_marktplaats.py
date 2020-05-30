@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 from scraper.models import *
-
+import dateparser
 
 class Command(BaseCommand):
     help = 'Scrapes marktplaats'
@@ -11,10 +11,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Base url includes 'airco' keyword
         MARKTPLAATS_URL = 'https://www.marktplaats.nl'
-        BASE_URL = 'https://www.marktplaats.nl/l/auto-s/fiat/f/grande-punto/772/#q:airco|f:10882,759,779|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
+        BASE_URL = 'https://www.marktplaats.nl/l/auto-s/fiat/f/grande-punto/772/p/1/#q:airco|f:10882,759,779|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
         URL_SUFFIX = '#q:airco|f:10882,779,772|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
 
-        Auto.objects.all().delete()
+        #Auto.objects.all().delete()
 
         next_page = BASE_URL
 
@@ -31,7 +31,11 @@ class Command(BaseCommand):
                 listing_page = requests.get(listing_url)
                 listing_soup = BeautifulSoup(listing_page.text, 'html.parser')
 
-                auto = Auto(url=listing_url)
+                titel = listing_soup.find('h1', id='title').text
+
+                date_string = listing_soup.find('span', id='displayed-since').find_all('span')[-1].text
+                date = dateparser.parse(date_string)
+                auto = Auto(url=listing_url, titel=titel, upload_datum=date)
 
                 for feature in listing_soup.find_all('div', class_='spec-table-item'):
                     key = feature.find('span', class_='key').text
@@ -40,7 +44,10 @@ class Command(BaseCommand):
                     if "Kilometerstand" in key:
                         auto.kilometer_stand = int(re.sub("[^0-9]", "", value))
                     if "Prijs" in key:
-                        auto.prijs = int(int(re.sub("[^0-9]", "", value)) / 100)
+                        try:
+                            auto.prijs = int(int(re.sub("[^0-9]", "", value)) / 100)
+                        except Exception:
+                            print("Couldn't parse value: ", value)
                     if "Transmissie" in key:
                         auto.isHandgeschakeld = bool("Handgeschakeld" in value)
                     if "Bouwjaar" in key:
@@ -53,10 +60,8 @@ class Command(BaseCommand):
                         auto.kenteken = value
 
                 auto.save()
-                print("Saved: ", auto)
-                break
+                print("Saved: ", auto.titel)
 
-            pagination = soup.find('div', class_='mp-PaginationControls')
-            next_button = pagination.find_all('a', class_='mp-Button')[-1]
-            next_page = "https://marktplaats.nl" + next_button['href'] + URL_SUFFIX
+            # Regex magic to increment page
+            next_page = re.sub(r'\/p\/\d\/', lambda exp: "/p/{}/".format(int(re.sub("[^0-9]", "", exp.group(0))) + 1), next_page)
             print(next_page)
