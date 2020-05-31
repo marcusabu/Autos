@@ -1,9 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from bs4 import BeautifulSoup
 import requests
 import re
 from scraper.models import *
 import dateparser
+from django.db import IntegrityError
 
 
 class Command(BaseCommand):
@@ -13,7 +14,6 @@ class Command(BaseCommand):
         # Base url includes 'airco' keyword
         MARKTPLAATS_URL = 'https://www.marktplaats.nl'
         BASE_URL = 'https://www.marktplaats.nl/l/auto-s/fiat/f/grande-punto/772/p/1/#q:airco|f:10882,759,779|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
-        URL_SUFFIX = '#q:airco|f:10882,779,772|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
 
         #Auto.objects.all().delete()
 
@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
                 date_string = listing_soup.find('span', id='displayed-since').find_all('span')[-1].text
                 date = dateparser.parse(date_string)
-                auto = Auto(url=listing_url, titel=titel, upload_datum=date)
+                auto = Auto(url=listing_url, titel=titel, upload_datum=date, bron='marktplaats')
 
                 for feature in listing_soup.find_all('div', class_='spec-table-item'):
                     key = feature.find('span', class_='key').text
@@ -50,18 +50,23 @@ class Command(BaseCommand):
                         except Exception:
                             print("Couldn't parse value: ", value)
                     if "Transmissie" in key:
-                        auto.isHandgeschakeld = bool("Handgeschakeld" in value)
+                        auto.is_handgeschakeld = bool("Handgeschakeld" in value)
                     if "Bouwjaar" in key:
                         auto.bouwjaar = int(value)
                     if "Brandstof" in key:
-                        auto.isBenzine = bool("Benzine" in value)
+                        auto.is_benzine = bool("Benzine" in value)
                     if "Vermogen" in key:
                         auto.vermogen = int(re.sub("[^0-9]", "", value))
                     if "Kenteken" in key:
                         auto.kenteken = value
 
-                auto.save()
-                print("Saved: ", auto.titel)
+                if auto.kenteken:
+                    try:
+                        auto.save()
+                        print("Saved: ", auto.titel)
+                    except IntegrityError as e:
+                        print("Kenteken {} already in database, skipping...".format(auto.kenteken))
+
 
             # Regex magic to increment page
             next_page = re.sub(r'\/p\/\d\/', lambda exp: "/p/{}/".format(int(re.sub("[^0-9]", "", exp.group(0))) + 1), next_page)
