@@ -1,9 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-import tensorflow as tf
 from tensorflow import keras
 import joblib
-import re
 import dateparser
 from django.views.decorators.csrf import csrf_exempt
 import json
