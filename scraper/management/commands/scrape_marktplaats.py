@@ -5,6 +5,7 @@ import re
 from scraper.models import *
 import dateparser
 
+
 class Command(BaseCommand):
     help = 'Scrapes marktplaats'
 
