@@ -1,0 +1,22 @@
+ {
+    "name": "Autos app extensie",
+    "version": "1.0",
+    "description": "Supported websites: Marktplaats",
+    "permissions": ["activeTab","declarativeContent"],
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": true
+    },
+    "page_action": {
+      "default_popup": "popup.html"
+    },
+   "content_scripts": [
+   {
+     "matches": ["https://*.marktplaats.nl/*"],
+     "css": ["style.css"],
+     "run_at": "document_end",
+     "js": ["contentScript.js"]
+   }
+ ],
+    "manifest_version": 2
+  }

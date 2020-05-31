@@ -6,28 +6,31 @@ import joblib
 import re
 import dateparser
 import numpy as np
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 def index(request):
-    return render('')
+    return render(request, 'api.html')
 
 
+@csrf_exempt
 def predict(request):
     MODEL_PATH = 'models/TFAuto'
     model = keras.models.load_model(MODEL_PATH)
     scaler = joblib.load(MODEL_PATH + '/TFScaler.pkl')
 
-    for key, value in request.GET.items():
+    for key, value in json.loads(request.body.decode("utf-8")).items():
         if "kilometer_stand" in key:
-            kilometer_stand = float(re.sub("[^0-9]", "", value))
-        if "transmissie" in key:
-            is_handgeschakeld = float(bool("Handgeschakeld" in value))
+            kilometer_stand = float(value)
+        if "is_handgeschakeld" in key:
+            is_handgeschakeld = float(value)
         if "bouwjaar" in key:
             bouwjaar = float(value)
-        if "brandstof" in key:
-            is_benzine = float(bool("Benzine" in value))
+        if "is_benzine" in key:
+            is_benzine = float(value)
         if "vermogen" in key:
-            vermogen = float(re.sub("[^0-9]", "", value))
+            vermogen = float(value)
         if "upload_datum" in key:
             timestamp = float(dateparser.parse(value).toordinal())
 
@@ -38,4 +41,4 @@ def predict(request):
     except Exception as e:
         return HttpResponse(str(e))
 
-    return HttpResponse(prediction)
+    return HttpResponse(json.dumps({'prediction': prediction}))

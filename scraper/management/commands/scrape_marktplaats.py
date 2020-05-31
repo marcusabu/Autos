@@ -15,8 +15,6 @@ class Command(BaseCommand):
         MARKTPLAATS_URL = 'https://www.marktplaats.nl'
         BASE_URL = 'https://www.marktplaats.nl/l/auto-s/fiat/f/grande-punto/772/p/1/#q:airco|f:10882,759,779|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
 
-        #Auto.objects.all().delete()
-
         next_page = BASE_URL
 
         while next_page:
@@ -70,4 +68,4 @@ class Command(BaseCommand):
 
             # Regex magic to increment page
             next_page = re.sub(r'\/p\/\d\/', lambda exp: "/p/{}/".format(int(re.sub("[^0-9]", "", exp.group(0))) + 1), next_page)
-            print(next_page)
+            print(next_page, '\n\n')
