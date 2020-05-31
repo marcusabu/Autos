@@ -4,12 +4,9 @@ let price_el = document.querySelector("#vip-ad-price-container > span:nth-child(
 const price = price_el.innerHTML
 price_el.innerHTML = "Berekenen...";
 
-
 const auto = {}
 
-//auto['kilometer_stand'] = parseInt(document.querySelector("#usps-block-container > div:nth-child(1) > div.usp-block-value").innerHTML.replace(/\D/g,''))
 auto['upload_datum'] = document.querySelector("#displayed-since > span:nth-child(3)").innerHTML;
-//auto['bouwjaar'] = document.querySelector("#usps-block-container > div:nth-child(2) > div.usp-block-value").innerHTML;
 var divs = document.querySelectorAll('#car-attributes > div.car-feature-table.spec-table.spec-table_flex > .spec-table-item'), i;
 
 divs.forEach(feature => {
@@ -44,8 +41,7 @@ fetch('http://127.0.0.1:8000/predict/', {
     return response.json();
 })
     .then(prediction_obj => {
-        const prediction = prediction_obj.prediction
-        console.log(prediction);
+        const prediction = prediction_obj.prediction;
 
         let price_el = document.querySelector("#vip-ad-price-container > span:nth-child(1)");
         let prediction_el = price_el.cloneNode(true);
@@ -55,13 +51,17 @@ fetch('http://127.0.0.1:8000/predict/', {
         price_el.innerHTML = price
         prediction_el.innerHTML = " 🤖" + '👉 ' + prediction_el.innerHTML
 
+
         if (prediction > parseInt(price.replace(/\D/g,'')) / 100) {
             prediction_el.innerHTML = prediction_el.innerHTML + ' 🤑'
         } else {
             prediction_el.innerHTML = prediction_el.innerHTML + ' 😤'
         }
 
+        if (prediction_obj.error) {
+            prediction_el.innerHTML = " 🤖" + '👉 Error 😔';
+            console.log(prediction_obj.error)
+        }
+
         document.querySelector("#vip-ad-price-container").appendChild(prediction_el)
-
-
     })

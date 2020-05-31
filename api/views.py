@@ -5,7 +5,6 @@ from tensorflow import keras
 import joblib
 import re
 import dateparser
-import numpy as np
 from django.views.decorators.csrf import csrf_exempt
 import json
 
@@ -39,6 +38,6 @@ def predict(request):
         autos_scaled = scaler.transform([row])
         prediction = int(model.predict(autos_scaled)[0][0])
     except Exception as e:
-        return HttpResponse(str(e))
+        return HttpResponse(json.dumps({'error': str(e)}))
 
     return HttpResponse(json.dumps({'prediction': prediction}))
