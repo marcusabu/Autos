@@ -5,6 +5,7 @@ import joblib
 import dateparser
 from django.views.decorators.csrf import csrf_exempt
 import json
+from datetime import datetime
 
 
 def index(request):
@@ -29,10 +30,12 @@ def predict(request):
         if "vermogen" in key:
             vermogen = float(value)
         if "upload_datum" in key:
-            upload_datum = float(dateparser.parse(value).toordinal())
+            upload_datum = float(datetime.now().toordinal() - dateparser.parse(value).toordinal())
+        if "apk" in key:
+            apk = float(datetime.now().toordinal() - dateparser.parse(value).toordinal())
 
     #try:
-    row = [0, 1, bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, ]
+    row = [bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk]
     autos_scaled = scaler.transform([row])
     prediction = int(model.predict(autos_scaled)[0][0])
     #except Exception as e:
