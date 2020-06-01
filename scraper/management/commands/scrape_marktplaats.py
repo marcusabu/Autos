@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
         next_page = BASE_URL
 
-        Auto.objects.first().delete()
+        #Auto.objects.all().delete()
 
         while next_page:
             page = requests.get(next_page)

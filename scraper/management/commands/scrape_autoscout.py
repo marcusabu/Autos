@@ -17,11 +17,15 @@ class Command(BaseCommand):
 
         next_page = BASE_URL
 
+        #Auto.objects.filter(bron='autoscout').delete()
+
         while next_page:
             page = requests.get(next_page)
             soup = BeautifulSoup(page.text, 'html.parser')
 
             for listing in soup.find_all('div', class_='cl-list-element'):
+                if not listing.find('a'):
+                    continue
                 listing_url = AUTOSCOUT_URL + listing.find('a')['href']
                 if not listing_url:
                     print("Listing link not found")
@@ -31,32 +35,38 @@ class Command(BaseCommand):
                 listing_soup = BeautifulSoup(listing_page.text, 'html.parser')
 
                 titel = listing_soup.find('h1', class_='cldt-detail-title').text.replace('\n', '')
+                prijs = int(re.sub("[^0-9]", "", listing_soup.find('div', class_='cldt-price').text.strip()))
 
-                date_string = listing_soup.find('span', id='displayed-since').find_all('span')[-1].text
-                date = dateparser.parse(date_string)
-                auto = Auto(url=listing_url, titel=titel, upload_datum=date, bron='marktplaats')
+                try:
+                    ad_url = listing_soup.find('a', class_='fed-finnik-link fed-data-url').get('data-url')
+                except Exception as e:
+                    print("Cant find kenteken for ", listing_url)
+                    continue
+                kenteken = re.search(r'kenteken/.+/', ad_url).group().split('/')[1]
 
-                for feature in listing_soup.find_all('div', class_='spec-table-item'):
-                    key = feature.find('span', class_='key').text
-                    value = feature.find('span', class_='value').text
+                auto = Auto(url=listing_url, titel=titel, bron='autoscout', kenteken=kenteken, prijs=prijs)
 
-                    if "Kilometerstand" in key:
+                for feature in listing_soup.find_all('span', class_='cldt-stage-primary-keyfact'):
+                    value = feature.text
+
+                    if "km" in value:
                         auto.kilometer_stand = int(re.sub("[^0-9]", "", value))
-                    if "Prijs" in key:
-                        try:
-                            auto.prijs = int(int(re.sub("[^0-9]", "", value)) / 100)
-                        except Exception:
-                            print("Couldn't parse value: ", value)
+                    if "/" in value: # Since 05/2013 string
+                        auto.bouwjaar = int(value.split('/')[1])
+                    if "PK" in value:
+                        auto.vermogen = int(re.sub("[^0-9]", "", value))
+
+                for feature in listing_soup.find_all('dl'):
+                    key = feature.find('dt').text
+                    value = feature.find('dd').text
+
+                    if 'Categorie' in key:
+                        if len(feature.find_all('dd')) > 1:
+                            auto.apk = dateparser.parse(feature.find_all('dd')[1].text.strip())
                     if "Transmissie" in key:
                         auto.is_handgeschakeld = bool("Handgeschakeld" in value)
-                    if "Bouwjaar" in key:
-                        auto.bouwjaar = int(value)
                     if "Brandstof" in key:
                         auto.is_benzine = bool("Benzine" in value)
-                    if "Vermogen" in key:
-                        auto.vermogen = int(re.sub("[^0-9]", "", value))
-                    if "Kenteken" in key:
-                        auto.kenteken = value
 
                 if auto.kenteken:
                     try:
@@ -67,5 +77,7 @@ class Command(BaseCommand):
 
 
             # Regex magic to increment page
-            next_page = re.sub(r'\/p\/\d\/', lambda exp: "/p/{}/".format(int(re.sub("[^0-9]", "", exp.group(0))) + 1), next_page)
+            next_page = re.sub(r'page=\d',
+                               lambda exp: "page={}".format(int(re.sub("[^0-9]", "", exp.group(0))) + 1),
+                               next_page)
             print(next_page, '\n\n')

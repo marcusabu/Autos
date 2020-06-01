@@ -15,7 +15,7 @@ class Command(BaseCommand):
         AUTOTRACK_URL = 'https://www.autotrack.nl'
         BASE_URL = 'https://www.autotrack.nl/aanbod?merkIds=4f2f74d0-7812-416b-987f-210f9b3f5549&modelIds=4f318d5e-6f1a-4cf1-ba98-3677f529ac59&minimumprijs=&maximumprijs=&minimumbouwjaar=2007&zoekoptieIds=99ee096c-249b-4c50-ae4e-90653b1b58f5&paginagrootte=30&paginanummer=1'
 
-        Auto.objects.filter(bron='autotrack').delete()
+        #Auto.objects.filter(bron='autotrack').delete()
 
         next_page = BASE_URL
 
