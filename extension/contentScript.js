@@ -2,7 +2,7 @@ console.log("Running contentScript")
 
 const price_el = document.querySelector("#vip-ad-price-container > span:nth-child(1)");
 const price = price_el.innerHTML
-price_el.innerHTML = "Berekenen...";
+price_el.innerHTML = price_el.innerHTML + "(Berekenen...)";
 
 const prediction_el = price_el.cloneNode(true);
 
@@ -37,8 +37,8 @@ divs.forEach(feature => {
     }
 })
 
-fetch('http://127.0.0.1:8000/predict/', {
-//fetch('https://sheltered-chamber-82504.herokuapp.com/predict/', {
+//fetch('http://127.0.0.1:8000/predict/', {
+fetch('https://sheltered-chamber-82504.herokuapp.com/predict/', {
     method: 'post',
     body: JSON.stringify(auto)
 }).then(response => {
@@ -54,9 +54,9 @@ fetch('http://127.0.0.1:8000/predict/', {
 
 
         if (prediction > parseInt(price.replace(/\D/g, '')) / 100) {
-            prediction_el.innerHTML = prediction_el.innerHTML + ' 🤑'
+            prediction_el.innerHTML = prediction_el.innerHTML + ' ✅'
         } else {
-            prediction_el.innerHTML = prediction_el.innerHTML + ' 😤'
+            prediction_el.innerHTML = prediction_el.innerHTML + ' ❌'
         }
 
         if (prediction_obj.error) {
@@ -66,5 +66,5 @@ fetch('http://127.0.0.1:8000/predict/', {
 
         document.querySelector("#vip-ad-price-container").appendChild(prediction_el)
     }).catch(response => {
-
+        price_el.innerHTML = price + " 🤖" + '👉  ❓';
 })
