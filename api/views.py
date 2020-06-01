@@ -29,13 +29,13 @@ def predict(request):
         if "vermogen" in key:
             vermogen = float(value)
         if "upload_datum" in key:
-            timestamp = float(dateparser.parse(value).toordinal())
+            upload_datum = float(dateparser.parse(value).toordinal())
 
-    try:
-        row = [bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, timestamp]
-        autos_scaled = scaler.transform([row])
-        prediction = int(model.predict(autos_scaled)[0][0])
-    except Exception as e:
-        return HttpResponse(json.dumps({'error': str(e)}))
+    #try:
+    row = [0, 1, bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, ]
+    autos_scaled = scaler.transform([row])
+    prediction = int(model.predict(autos_scaled)[0][0])
+    #except Exception as e:
+        #return HttpResponse(json.dumps({'error': str(e)}))
 
     return HttpResponse(json.dumps({'prediction': prediction}))
