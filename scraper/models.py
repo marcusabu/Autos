@@ -13,6 +13,7 @@ class Auto(models.Model):
     is_benzine = models.BooleanField(null=True, blank=True)
     url = models.CharField(max_length=500)
     bron = models.CharField(max_length=100)
+    apk = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.titel

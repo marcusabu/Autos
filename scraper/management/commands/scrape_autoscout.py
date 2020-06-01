@@ -8,23 +8,21 @@ from django.db import IntegrityError
 
 
 class Command(BaseCommand):
-    help = 'Scrapes marktplaats'
+    help = 'Scrapes autoscout'
 
     def handle(self, *args, **options):
         # Base url includes 'airco' keyword
-        MARKTPLAATS_URL = 'https://www.marktplaats.nl'
-        BASE_URL = 'https://www.marktplaats.nl/l/auto-s/fiat/f/grande-punto/772/p/1/#q:airco|f:10882,759,779|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
+        AUTOSCOUT_URL = 'https://www.autoscout24.nl'
+        BASE_URL = 'https://www.autoscout24.nl/lst/fiat?sort=standard&desc=0&ustate=N%2CU&size=20&page=1&cy=NL&version0=punto&fregfrom=2007&atype=C&'
 
         next_page = BASE_URL
-
-        Auto.objects.first().delete()
 
         while next_page:
             page = requests.get(next_page)
             soup = BeautifulSoup(page.text, 'html.parser')
 
-            for listing in soup.find_all('li', class_='mp-Listing'):
-                listing_url = MARKTPLAATS_URL + listing.find('a', class_='mp-Listing-coverLink')['href']
+            for listing in soup.find_all('div', class_='cl-list-element'):
+                listing_url = AUTOSCOUT_URL + listing.find('a')['href']
                 if not listing_url:
                     print("Listing link not found")
                     break
@@ -32,7 +30,7 @@ class Command(BaseCommand):
                 listing_page = requests.get(listing_url)
                 listing_soup = BeautifulSoup(listing_page.text, 'html.parser')
 
-                titel = listing_soup.find('h1', id='title').text
+                titel = listing_soup.find('h1', class_='cldt-detail-title').text.replace('\n', '')
 
                 date_string = listing_soup.find('span', id='displayed-since').find_all('span')[-1].text
                 date = dateparser.parse(date_string)
@@ -59,8 +57,6 @@ class Command(BaseCommand):
                         auto.vermogen = int(re.sub("[^0-9]", "", value))
                     if "Kenteken" in key:
                         auto.kenteken = value
-                    if "APK tot" in key:
-                        auto.apk = dateparser.parse(value)
 
                 if auto.kenteken:
                     try:
