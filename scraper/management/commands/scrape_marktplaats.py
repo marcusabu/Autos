@@ -5,6 +5,7 @@ import re
 from scraper.models import *
 import dateparser
 from django.db import IntegrityError
+from django.utils import timezone
 
 
 class Command(BaseCommand):
@@ -13,7 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Base url includes 'airco' keyword
         MARKTPLAATS_URL = 'https://www.marktplaats.nl'
-        BASE_URL = 'https://www.marktplaats.nl/l/auto-s/fiat/f/grande-punto/772/p/1/#q:airco|f:10882,759,779|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
+        BASE_URL = 'https://www.marktplaats.nl/l/auto-s/f/benzine+hatchback/473+481/p/1/#f:10882,172|PriceCentsFrom:100000|PriceCentsTo:1000000|constructionYearFrom:2010|postcode:2333AS'
 
         next_page = BASE_URL
 
@@ -37,7 +38,7 @@ class Command(BaseCommand):
                     titel = listing_soup.find('h1', id='title').text
 
                     date_string = listing_soup.find('span', id='displayed-since').find_all('span')[-1].text
-                    date = dateparser.parse(date_string)
+                    date = timezone.make_aware(dateparser.parse(date_string))
                     auto = Auto(url=listing_url, titel=titel, upload_datum=date, bron='marktplaats')
 
                     for feature in listing_soup.find_all('div', class_='spec-table-item'):
@@ -63,6 +64,13 @@ class Command(BaseCommand):
                             auto.kenteken = value
                         if "APK tot" in key:
                             auto.apk = dateparser.parse(value)
+                        if "Merk" in key:
+                            try:
+                                auto.merk = value.split(' ')[0]
+                                auto.model = value.split(' ')[1]
+                            except Exception as e:
+                                print("Cant find Merk & Model from ", value)
+                                continue
 
                     if auto.kenteken:
                         try:
@@ -71,8 +79,9 @@ class Command(BaseCommand):
                         except IntegrityError as e:
                             print("Kenteken {} already in database, skipping...".format(auto.kenteken))
             else:
-                print("No more listings found at ", next_page)
+                print("\n\nNo more listings found at ", next_page)
+                break
 
             # Regex magic to increment page
-            next_page = re.sub(r'\/p\/\d\/', lambda exp: "/p/{}/".format(int(re.sub("[^0-9]", "", exp.group(0))) + 1), next_page)
+            next_page = re.sub(r'\/p\/\d+\/', lambda exp: "/p/{}/".format(int(re.sub("[^0-9]", "", exp.group())) + 1), next_page)
             print(next_page, '\n\n')

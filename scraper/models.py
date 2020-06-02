@@ -14,6 +14,8 @@ class Auto(models.Model):
     url = models.CharField(max_length=500)
     bron = models.CharField(max_length=100)
     apk = models.DateField(null=True, blank=True)
+    merk = models.CharField(null=True, blank=True, max_length=30)
+    model = models.CharField(null=True, blank=True, max_length=30)
 
     def __str__(self):
         return self.titel
