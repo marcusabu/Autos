@@ -6,6 +6,7 @@ import dateparser
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
+from scraper.models import Auto
 
 
 def index(request):
@@ -17,6 +18,14 @@ def predict(request):
     MODEL_PATH = 'models/TFAuto'
     model = keras.models.load_model(MODEL_PATH)
     scaler = joblib.load(MODEL_PATH + '/TFScaler.pkl')
+
+    bouwjaar = None
+    kilometer_stand = None
+    vermogen = None
+    is_handgeschakeld = None
+    is_benzine = None
+    upload_datum = None
+    apk = None
 
     for key, value in json.loads(request.body.decode("utf-8")).items():
         if "kilometer_stand" in key:
@@ -35,7 +44,7 @@ def predict(request):
             apk = float(datetime.now().toordinal() - dateparser.parse(value).toordinal())
 
     #try:
-    row = [bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk]
+    row = [bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, upload_datum, apk]
     autos_scaled = scaler.transform([row])
     prediction = int(model.predict(autos_scaled)[0][0])
     #except Exception as e:

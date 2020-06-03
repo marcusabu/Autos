@@ -37,8 +37,8 @@ divs.forEach(feature => {
     }
 })
 
-//fetch('http://127.0.0.1:8000/predict/', {
-fetch('https://sheltered-chamber-82504.herokuapp.com/predict/', {
+fetch('http://127.0.0.1:8000/predict/', {
+//fetch('https://sheltered-chamber-82504.herokuapp.com/predict/', {
     method: 'post',
     body: JSON.stringify(auto)
 }).then(response => {
