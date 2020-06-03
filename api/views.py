@@ -18,6 +18,14 @@ def predict(request):
     model = keras.models.load_model(MODEL_PATH)
     scaler = joblib.load(MODEL_PATH + '/TFScaler.pkl')
 
+    bouwjaar = 0.
+    kilometer_stand = 0.
+    vermogen = 0.
+    is_handgeschakeld = 0.
+    is_benzine = 0.
+    upload_datum = 0.
+    apk = 0.
+
     for key, value in json.loads(request.body.decode("utf-8")).items():
         if "kilometer_stand" in key:
             kilometer_stand = float(value)
