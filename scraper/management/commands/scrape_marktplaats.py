@@ -62,7 +62,7 @@ class Command(BaseCommand):
                         if "Kenteken" in key:
                             auto.kenteken = value
                         if "APK tot" in key:
-                            auto.apk = dateparser.parse(value)
+                            auto.apk = dateparser.parse(value).date()
 
                     if auto.kenteken:
                         try:

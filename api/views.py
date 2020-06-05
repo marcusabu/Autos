@@ -14,9 +14,12 @@ def index(request):
 
 @csrf_exempt
 def predict(request):
-    MODEL_PATH = 'models/TFAuto'
-    model = keras.models.load_model(MODEL_PATH)
-    scaler = joblib.load(MODEL_PATH + '/TFScaler.pkl')
+    # MODEL_PATH = 'models/TFAuto'
+    # model = keras.models.load_model(MODEL_PATH)
+    # scaler = joblib.load(MODEL_PATH + '/TFScaler.pkl')
+
+    model = joblib.load('models/RandomForestRegressor')
+    scaler = joblib.load('models/RFScaler')
 
     bouwjaar = 0.
     kilometer_stand = 0.
@@ -45,7 +48,7 @@ def predict(request):
     #try:
     row = [bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk]
     autos_scaled = scaler.transform([row])
-    prediction = int(model.predict(autos_scaled)[0][0])
+    prediction = int(model.predict(autos_scaled)[0])
     #except Exception as e:
         #return HttpResponse(json.dumps({'error': str(e)}))
 
