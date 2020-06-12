@@ -7,6 +7,7 @@ price_el.innerHTML = price_el.innerHTML + "(Berekenen...)";
 const prediction_el = price_el.cloneNode(true);
 
 const auto = {}
+auto['titel'] = document.querySelector("#title").innerHTML;
 auto['upload_datum'] = document.querySelector("#displayed-since > span:nth-child(3)").innerHTML;
 
 let divs = document.querySelectorAll('#car-attributes > div.car-feature-table.spec-table.spec-table_flex > .spec-table-item'), i;

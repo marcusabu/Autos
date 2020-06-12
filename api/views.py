@@ -6,6 +6,7 @@ import dateparser
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
+import pandas as pd
 
 
 def index(request):
@@ -19,8 +20,9 @@ def predict(request):
     # scaler = joblib.load(MODEL_PATH + '/TFScaler.pkl')
 
     model = joblib.load('models/RandomForestRegressor')
-    scaler = joblib.load('models/RFScaler')
+    preprocessor = joblib.load('models/RFPreprocessor')
 
+    titel = ""
     bouwjaar = 0.
     kilometer_stand = 0.
     vermogen = 0.
@@ -30,6 +32,8 @@ def predict(request):
     apk = 0.
 
     for key, value in json.loads(request.body.decode("utf-8")).items():
+        if "titel" in key:
+            titel = str(value)
         if "kilometer_stand" in key:
             kilometer_stand = float(value)
         if "is_handgeschakeld" in key:
@@ -46,8 +50,11 @@ def predict(request):
             apk = float(datetime.now().toordinal() - dateparser.parse(value).toordinal())
 
     #try:
-    row = [bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk]
-    autos_scaled = scaler.transform([row])
+    target_names = ["titel", "bouwjaar", "kilometer_stand", "vermogen", "is_handgeschakeld", "is_benzine",
+                    "upload_datum", "apk"]
+    row = pd.DataFrame([[titel, bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk]], columns=target_names)
+    print(row.head())
+    autos_scaled = preprocessor.transform(row)
     prediction = int(model.predict(autos_scaled)[0])
     #except Exception as e:
         #return HttpResponse(json.dumps({'error': str(e)}))
