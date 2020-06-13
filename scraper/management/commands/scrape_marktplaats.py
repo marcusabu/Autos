@@ -5,12 +5,16 @@ import re
 from scraper.models import *
 import dateparser
 from django.db import IntegrityError
+import time
+
+PERIOD_OF_TIME = 500
 
 
 class Command(BaseCommand):
     help = 'Scrapes marktplaats'
 
     def handle(self, *args, **options):
+        start = time.time()
         # Base url includes 'airco' keyword
         MARKTPLAATS_URL = 'https://www.marktplaats.nl'
         BASE_URL = 'https://www.marktplaats.nl/l/auto-s/fiat/f/grande-punto/772/p/1/#q:airco|f:10882,759,779|constructionYearFrom:2007|postcode:2333AS|searchInTitleAndDescription:true'
@@ -20,6 +24,10 @@ class Command(BaseCommand):
         #Auto.objects.all().delete()
 
         while next_page:
+            if time.time() > start + PERIOD_OF_TIME:
+                print("Timout reached, stopping script...")
+                break
+
             page = requests.get(next_page)
             soup = BeautifulSoup(page.text, 'html.parser')
 
