@@ -50,9 +50,9 @@ def predict(request):
             apk = float(datetime.now().toordinal() - dateparser.parse(value).toordinal())
 
     #try:
-    target_names = ["titel", "bouwjaar", "kilometer_stand", "vermogen", "is_handgeschakeld", "is_benzine",
+    target_names = ["bouwjaar", "kilometer_stand", "vermogen", "is_handgeschakeld", "is_benzine",
                     "upload_datum", "apk"]
-    row = pd.DataFrame([[titel, bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk]], columns=target_names)
+    row = pd.DataFrame([[bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk]], columns=target_names)
     print(row.head())
     autos_scaled = preprocessor.transform(row)
     prediction = int(model.predict(autos_scaled)[0])
