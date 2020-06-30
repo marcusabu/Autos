@@ -61,7 +61,7 @@ class Command(BaseCommand):
                         if "Vermogen" in key:
                             auto.vermogen = int(re.sub("[^0-9]", "", value))
                         if "Kenteken" in key:
-                            auto.kenteken = str(value)
+                            auto.kenteken = re.sub("[^0-9a-zA-Z]", "", str(value))
 
                     if auto.kenteken:
                         try:

@@ -45,6 +45,7 @@ class Command(BaseCommand):
                         print("Cant find kenteken for ", listing_url)
                         continue
                     kenteken = re.search(r'kenteken/.+/', ad_url).group().split('/')[1]
+                    kenteken = re.sub("[^0-9a-zA-Z]", "", kenteken)
 
                     auto = Auto(url=listing_url, titel=titel, bron='autoscout', kenteken=kenteken, prijs=prijs)
 

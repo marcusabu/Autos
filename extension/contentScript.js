@@ -8,9 +8,9 @@ const prediction_el = price_el.cloneNode(true);
 
 const auto = {}
 auto['titel'] = document.querySelector("#title").innerHTML;
-auto['upload_datum'] = document.querySelector("#displayed-since > span:nth-child(3)").innerHTML;
 
 let divs = document.querySelectorAll('#car-attributes > div.car-feature-table.spec-table.spec-table_flex > .spec-table-item'), i;
+
 divs.forEach(feature => {
     let key = feature.getElementsByClassName('key')[0].innerText;
     let value = feature.getElementsByClassName('value')[0].innerText;
@@ -32,9 +32,6 @@ divs.forEach(feature => {
     }
     if (key.includes('Bouwjaar')) {
         auto['bouwjaar'] = parseInt(value.replace(/\D/g, ''))
-    }
-    if (key.includes('APK')) {
-        auto['apk'] = value
     }
 })
 

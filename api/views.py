@@ -24,8 +24,6 @@ def predict(request):
     vermogen = 0.
     is_handgeschakeld = 0.
     is_benzine = 0.
-    upload_datum = 0.
-    apk = 0.
 
     for key, value in json.loads(request.body.decode("utf-8")).items():
         if "titel" in key:
@@ -40,15 +38,10 @@ def predict(request):
             is_benzine = float(value)
         if "vermogen" in key:
             vermogen = float(value)
-        if "upload_datum" in key:
-            upload_datum = float(datetime.now().toordinal() - dateparser.parse(value).toordinal())
-        if "apk" in key:
-            apk = float(datetime.now().toordinal() - dateparser.parse(value).toordinal())
 
     #try:
-    target_names = ["bouwjaar", "kilometer_stand", "vermogen", "is_handgeschakeld", "is_benzine",
-                    "upload_datum", "apk", "titel"]
-    row = pd.DataFrame([[bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk, titel]], columns=target_names)
+    target_names = ["bouwjaar", "kilometer_stand", "vermogen", "is_handgeschakeld", "is_benzine", "titel"]
+    row = pd.DataFrame([[bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, titel]], columns=target_names)
     prediction = int(model.predict(row)[0])
     #except Exception as e:
         #return HttpResponse(json.dumps({'error': str(e)}))

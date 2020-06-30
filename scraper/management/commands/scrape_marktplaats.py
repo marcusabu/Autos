@@ -68,7 +68,7 @@ class Command(BaseCommand):
                         if "Vermogen" in key:
                             auto.vermogen = int(re.sub("[^0-9]", "", value))
                         if "Kenteken" in key:
-                            auto.kenteken = value
+                            auto.kenteken = re.sub("[^0-9a-zA-Z]", "", str(value))
                         if "APK tot" in key:
                             auto.apk = dateparser.parse(value).date()
 
