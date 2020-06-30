@@ -77,7 +77,9 @@ class Command(BaseCommand):
                             auto.save()
                             print("Saved: ", auto.titel)
                         except IntegrityError as e:
-                            print("Kenteken {} already in database, skipping...".format(auto.kenteken))
+                            print("Kenteken {} already in database, refreshing...".format(auto.kenteken))
+                            Auto.objects.get(kenteken=auto.kenteken).delete()
+                            auto.save()
             else:
                 print("No more listings found at ", next_page)
 
