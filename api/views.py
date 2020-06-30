@@ -15,12 +15,7 @@ def index(request):
 
 @csrf_exempt
 def predict(request):
-    # MODEL_PATH = 'models/TFAuto'
-    # model = keras.models.load_model(MODEL_PATH)
-    # scaler = joblib.load(MODEL_PATH + '/TFScaler.pkl')
-
-    model = joblib.load('models/RandomForestRegressor')
-    preprocessor = joblib.load('models/RFPreprocessor')
+    model = joblib.load('models/Regressor')
 
     titel = ""
     bouwjaar = 0.
@@ -51,11 +46,9 @@ def predict(request):
 
     #try:
     target_names = ["bouwjaar", "kilometer_stand", "vermogen", "is_handgeschakeld", "is_benzine",
-                    "upload_datum", "apk"]
-    row = pd.DataFrame([[bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk]], columns=target_names)
-    print(row.head())
-    autos_scaled = preprocessor.transform(row)
-    prediction = int(model.predict(autos_scaled)[0])
+                    "upload_datum", "apk", "titel"]
+    row = pd.DataFrame([[bouwjaar, kilometer_stand, vermogen, is_handgeschakeld, is_benzine, upload_datum, apk, titel]], columns=target_names)
+    prediction = int(model.predict(row)[0])
     #except Exception as e:
         #return HttpResponse(json.dumps({'error': str(e)}))
 
