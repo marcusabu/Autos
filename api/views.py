@@ -16,6 +16,7 @@ def index(request):
 @csrf_exempt
 def predict(request):
     model = joblib.load('models/Regressor')
+    # tensorflowModel = keras.models.load_model('models/NeuralNetwork')
 
     titel = ""
     bouwjaar = 0.
