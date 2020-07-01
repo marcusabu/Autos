@@ -1,16 +1,8 @@
-from django.shortcuts import render
 from django.http import HttpResponse
-from tensorflow import keras
 import joblib
-import dateparser
 from django.views.decorators.csrf import csrf_exempt
 import json
-from datetime import datetime
 import pandas as pd
-
-
-def index(request):
-    return render(request, 'api.html')
 
 
 @csrf_exempt
