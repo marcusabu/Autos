@@ -16,6 +16,8 @@ Predicts the price of a Fiat Punto (Grande/Evo) on Marktplaats ads
 * Install extension in Chrome
 
 ```
+git clone https://github.com/marcusabu/Autos.git
+cd Autos
 pip install -r requirements.txt
 ```
 
@@ -29,6 +31,8 @@ python manage.py runserver
 * scikit-learn
 * TensorFlow 2.0
 * Javascript
+* Heroku
+* SQL
 
 
 ## Author
