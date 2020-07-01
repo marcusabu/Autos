@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 SECRET_KEY = 'p06ivpb-r#)7x8ox#x(lit)vwy$ln4jki20ms8^1(wxk8mr18x'
-DEBUG = os.environ["DJANGO_DEBUG"] == 'True' or os.environ["DJANGO_DEBUG"] == 'true'
+DEBUG = os.environ["DJANGO_DEBUG"] == 'True' if "DJANGO_DEBUG" in os.environ else False
 
 ALLOWED_HOSTS = ['*']
 
