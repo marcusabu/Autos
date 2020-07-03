@@ -2,8 +2,15 @@
 
 Predicts the price of a Fiat Punto (Grande/Evo) on Marktplaats ads
 
+Project structure:
+* `Autos` Django configurations files
+* `api` REST API endpoint (Django App)
+* `extension` Chrome extension
+* `models` Jupyter notebooks used for generating model
+* `scraper` Marktplaats scaper (Django App)
+
 ## Demo
-![Alt Text](demo.gif)
+![Demo gif](demo.gif)
 
 ## Getting Started
 
