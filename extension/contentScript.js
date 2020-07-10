@@ -35,10 +35,17 @@ divs.forEach(feature => {
     }
 })
 
-// fetch('http://127.0.0.1:8000/predict/', {
-fetch('https://sheltered-chamber-82504.herokuapp.com/predict/', {
-    method: 'post',
-    body: JSON.stringify(auto)
+var str = "";
+for (var key in auto) {
+    if (str != "") {
+        str += "&";
+    }
+    str += key + "=" + encodeURIComponent(auto[key]);
+}
+
+const queryParams = str;
+
+fetch('https://marcusabu-predict-auto.azurewebsites.net/api/Predict?code=hJSwXzoRraPYKUtv3PfO0LbZCtmZLqaigEyZ6R8YGLoxZw71L10fsA==&' + queryParams, {
 }).then(response => {
     return response.json();
 })
